@@ -1,9 +1,20 @@
+from collections import UserDict
+
+class DefaultExecutionDict(UserDict):
+    def __getitem__(self, key):
+        if not key in self.data.keys():
+            return DEFAULT_METHOD
+        else:
+            return self.data.get(key)
+        
+
 def parse_input(user_input):
     cmd, *args = user_input.split()
     cmd = cmd.strip().lower()
     return cmd, *args
 
-def write_contact(args, contacts, is_change = False):
+
+def write_contact(contacts, args, is_change = False, *_):
     if len(args) != 2:
         return f"Bad arguments {args}."
     name, phone = args
@@ -16,14 +27,51 @@ def write_contact(args, contacts, is_change = False):
     contacts[name] = phone
     return f"Contact {name} {'changed' if is_change else 'added'}."
 
-def get_phone(args, contacts):
+
+def write_contact_add(contacts, args, *_):
+    return write_contact(contacts, args, False)
+    
+    
+def write_contact_change(contacts, args, *_):
+    return write_contact(contacts, args, True)
+    
+    
+    
+def get_phone(contacts, args, *_):
     name = args[0]
     if name not in contacts.keys():
         return f"{name} not found."
     return f"{contacts[name]}"
 
-def print_phonebook(contacts):
+
+def print_phonebook(contacts, *_):
     return '\n'.join(['{} {}'.format(k, v) for k,v in contacts.items()])
+
+
+def print_goodbye(*_):
+    return "Good bye!"
+
+
+def print_hello(*_):
+    return "How can I help you?"
+
+
+def print_bad(*_):
+    return "Invalid command."
+
+
+OPERATIONS = DefaultExecutionDict({
+    "close": print_goodbye,
+    "exit": print_goodbye,
+    "hello": print_hello,
+    "add": write_contact_add,
+    "change": write_contact_change,
+    "phone": get_phone,
+    "all": print_phonebook,
+})
+
+DEFAULT_METHOD = print_bad
+
 
 def main():
     contacts = {}
@@ -32,21 +80,10 @@ def main():
         user_input = input("Enter a command: ")
         command, *args = parse_input(user_input)
 
+        print(OPERATIONS[command](contacts, args, True if command == "change" else False))
         if command in ["close", "exit"]:
-            print("Good bye!")
             break
-        elif command == "hello":
-            print("How can I help you?")
-        elif command == "add":
-            print(write_contact(args, contacts))
-        elif command == "change":
-            print(write_contact(args, contacts, True))
-        elif command == "phone":
-            print(get_phone(args, contacts))
-        elif command == "all":
-            print(print_phonebook(contacts))
-        else:
-            print("Invalid command.")
-
+        
 if __name__ == "__main__":
     main()
+    

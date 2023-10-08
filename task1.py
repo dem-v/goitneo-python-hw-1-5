@@ -2,21 +2,21 @@ from datetime import datetime
 from collections import defaultdict
 
 MAX_DELTA_DAYS = 7
-CURRENT_DATE = datetime.today().date() #datetime(year=2023, month=12, day=30).date() 
 WEEKDAYS_LIST = [datetime(year=2001, month=1, day=i).strftime('%A') for i in range(1,8)]
+
 
 def get_birthdays_per_week(users: list) -> list:
     user_bd_by_weekday = defaultdict(list)
-    #CURRENT_DATE = datetime.today().date()
+    current_date = datetime.today().date()
     for user in users:
         name = user["name"]
         birthday = user["birthday"].date() 
-        birthday_this_year = birthday.replace(year=CURRENT_DATE.year)
+        birthday_this_year = birthday.replace(year=current_date.year)
         
-        today_distance = (birthday_this_year - CURRENT_DATE).days
+        today_distance = (birthday_this_year - current_date).days
         #let's not forget about those who had birthday on weekend and today is Monday
         if today_distance < 0:
-            today_distance = (birthday_this_year.replace(year=CURRENT_DATE.year + 1) - CURRENT_DATE).days
+            today_distance = (birthday_this_year.replace(year=current_date.year + 1) - current_date).days
             if today_distance > MAX_DELTA_DAYS:
                 continue
         
